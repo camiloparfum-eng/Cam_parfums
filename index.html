@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAM Parfums</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── Variables ── */
+:root{
+  --crema:#F0E7D5; --petroleo:#212842; --vino:#5B2C36; --caramelo:#B38C6A;
+  --crema-2:#f6f0e6; --linea:rgba(33,40,66,.16);
+  --f:'Jost',-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:var(--f);}
+body{background:var(--crema);color:var(--petroleo);min-height:100vh;line-height:1.5;-webkit-font-smoothing:antialiased;font-weight:300;}
+button{cursor:pointer;border:none;background:none;color:inherit;}
+img{display:block;max-width:100%;}
+input{font-family:var(--f);outline:none;}
+
+/* ── Loading ── */
+#cam-loading{
+  position:fixed;inset:0;z-index:200;background:var(--crema);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  transition:opacity .5s;
+}
+#cam-loading.fade-out{opacity:0;pointer-events:none;}
+.spinner{
+  width:40px;height:40px;border:2px solid var(--linea);
+  border-top-color:var(--caramelo);border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+#cam-loading p{font-size:13px;letter-spacing:.2em;text-transform:uppercase;opacity:.6;font-weight:300;}
+
+/* ── Header ── */
+.cam-head{
+  position:sticky;top:0;z-index:40;background:var(--petroleo);color:var(--crema);
+  display:flex;align-items:center;justify-content:space-between;padding:16px 30px;
+  border-bottom:1px solid rgba(230,223,215,.12);
+}
+.cam-brand{display:flex;flex-direction:column;line-height:1;}
+.cam-brand .name{font-size:27px;font-weight:500;letter-spacing:.04em;}
+.cam-brand .tag{font-size:10px;letter-spacing:.42em;text-transform:uppercase;opacity:.6;margin-top:5px;font-weight:300;}
+.cam-cartbtn{
+  display:flex;align-items:center;gap:9px;border:1px solid rgba(230,223,215,.3);border-radius:40px;
+  padding:9px 18px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:400;transition:.25s;
+}
+.cam-cartbtn:hover{background:rgba(230,223,215,.1);}
+.cam-cartbtn .dot{
+  background:var(--caramelo);color:var(--petroleo);font-weight:500;min-width:20px;height:20px;
+  border-radius:20px;font-size:11px;display:flex;align-items:center;justify-content:center;padding:0 5px;letter-spacing:0;
+}
+
+/* ── Section ── */
+.cam-sec{padding:50px 30px;max-width:1240px;margin:0 auto;}
+.cam-sec-head{margin-bottom:30px;}
+.cam-sec-head .sub{font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:var(--caramelo);margin-bottom:9px;display:block;font-weight:400;}
+.cam-sec-head h2{font-weight:300;font-size:36px;line-height:1;letter-spacing:.01em;}
+.cam-sec-head .count{font-size:12px;letter-spacing:.1em;opacity:.5;margin-top:6px;display:block;font-weight:300;}
+
+.cam-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(244px,1fr));gap:24px;}
+
+/* ── Card ── */
+.cam-card{
+  background:var(--crema-2);border:1px solid var(--linea);border-radius:4px;overflow:hidden;
+  display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.2,.7,.3,1),box-shadow .35s;position:relative;
+}
+.cam-card:hover{transform:translateY(-5px);box-shadow:0 22px 40px -26px rgba(33,40,66,.5);}
+.cam-card .imgwrap{
+  aspect-ratio:1/1;background:radial-gradient(80% 80% at 50% 35%,#fff,var(--crema-2));
+  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
+}
+.cam-card .imgwrap img{width:100%;height:100%;object-fit:cover;}
+.cam-card .imgwrap svg{width:100%;height:100%;}
+.cam-badge{
+  position:absolute;top:11px;left:11px;font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  background:var(--petroleo);color:var(--crema);padding:5px 9px;border-radius:2px;font-weight:400;z-index:2;
+}
+.cam-badge.excl{background:var(--vino);}
+.cam-card .body{padding:16px 16px 18px;border-top:1px solid var(--linea);display:flex;flex-direction:column;flex:1;}
+.cam-card .marca{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--caramelo);font-weight:500;}
+.cam-card .nombre{font-size:20px;font-weight:400;line-height:1.1;margin:5px 0 3px;}
+.cam-card .meta{font-size:10px;letter-spacing:.04em;text-transform:uppercase;margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-weight:400;}
+.cam-card .meta .pill{padding:2px 11px;border-radius:20px;line-height:1.5;}
+.m-conc{color:#fff;font-weight:500;}
+.m-conc.c-Extrait,.m-conc.c-Parfum,.m-conc.c-Elixir{background:var(--vino);}
+.m-conc.c-EDP{background:var(--petroleo);}
+.m-conc.c-EDT{background:var(--caramelo);}
+.m-conc.c-otro{background:#5a6488;}
+.m-fam{color:#fff;font-weight:500;}
+.m-fam.f-Diseñador{background:var(--petroleo);}
+.m-fam.f-Árabe{background:var(--caramelo);}
+.m-fam.f-Nicho{background:var(--vino);}
+.m-fam.f-otro{background:rgba(33,40,66,.4);}
+.m-gen{font-weight:500;letter-spacing:.08em;}
+.m-gen.g-Masculino{border:1px solid rgba(33,40,66,.4);color:var(--petroleo);}
+.m-gen.g-Femenino{border:1px solid rgba(91,44,54,.5);color:var(--vino);}
+.m-gen.g-Unisex{border:1px solid rgba(179,140,106,.6);color:#9a7550;}
+.cam-card .dupe{font-size:12px;opacity:.7;margin-top:7px;font-weight:300;}
+.cam-card .dupe b{font-weight:500;color:var(--vino);}
+.cam-card .sizes{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:13px;}
+.cam-size{border:1px solid var(--linea);border-radius:3px;padding:7px 4px;text-align:center;transition:.18s;line-height:1.2;}
+.cam-size:hover{border-color:var(--caramelo);background:#fff;}
+.cam-size .sz{font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.6;font-weight:400;display:block;}
+.cam-size .pr{font-size:14px;font-weight:500;display:block;margin-top:1px;}
+.cam-size.added{border:2px solid var(--caramelo);background:rgba(179,140,106,.12);color:var(--petroleo);padding:6px 3px;}
+.cam-size.added .sz{opacity:.7;color:var(--caramelo);}
+.cam-size.added .pr{color:var(--petroleo);}
+
+/* ── Toolbar ── */
+.cam-tools{position:sticky;top:65px;z-index:30;background:var(--crema);padding:18px 30px 14px;border-bottom:1px solid var(--linea);}
+.cam-toolsin{max-width:1240px;margin:0 auto;}
+.cam-toolsrow{display:flex;gap:10px;align-items:center;}
+.cam-search{
+  flex:1;display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--linea);
+  border-radius:40px;padding:11px 20px;margin-bottom:14px;
+}
+.cam-search svg{flex:none;opacity:.5;}
+.cam-search input{flex:1;border:none;background:none;font-size:15px;font-weight:300;color:var(--petroleo);letter-spacing:.01em;}
+.cam-search input::placeholder{color:var(--petroleo);opacity:.4;}
+.cam-search .clear{font-size:18px;opacity:.4;transition:.2s;display:none;}
+.cam-search .clear:hover{opacity:1;}
+.cam-search.has .clear{display:block;}
+.cam-filterbtn{
+  flex:none;display:flex;align-items:center;gap:8px;background:var(--petroleo);color:var(--crema);
+  border-radius:40px;padding:11px 20px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:400;transition:.25s;
+}
+.cam-filterbtn:hover{background:#2c3258;}
+.cam-filterbtn .fcount{
+  background:var(--caramelo);color:var(--petroleo);min-width:18px;height:18px;border-radius:18px;
+  font-size:11px;display:flex;align-items:center;justify-content:center;padding:0 5px;letter-spacing:0;font-weight:500;
+}
+
+/* ── Panel filtros ── */
+.cam-fscrim{position:fixed;inset:0;z-index:100;background:rgba(33,40,66,.45);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .3s;}
+.cam-fscrim.show{opacity:1;pointer-events:auto;}
+.cam-fpanel{
+  position:fixed;top:0;left:0;height:100%;width:340px;max-width:88vw;z-index:101;
+  background:var(--crema);box-shadow:30px 0 60px -30px rgba(33,40,66,.6);display:flex;flex-direction:column;
+  transform:translateX(-100%);transition:transform .4s cubic-bezier(.3,.7,.2,1);
+}
+.cam-fpanel.show{transform:none;}
+.cam-fpanel .fhead{background:var(--petroleo);color:var(--crema);padding:20px 22px;display:flex;justify-content:space-between;align-items:center;}
+.cam-fpanel .fhead h3{font-weight:400;font-size:23px;}
+.cam-fpanel .fbody{flex:1;overflow-y:auto;padding:6px 0;}
+.cam-fpanel .ffoot{padding:16px 20px;border-top:1px solid var(--linea);display:flex;gap:10px;}
+.cam-fpanel .fclear{flex:1;background:none;border:1px solid var(--linea);color:var(--petroleo);padding:13px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;border-radius:3px;transition:.2s;font-weight:400;}
+.cam-fpanel .fclear:hover{border-color:var(--vino);color:var(--vino);}
+.cam-fpanel .fapply{flex:1.4;background:var(--petroleo);color:var(--crema);padding:13px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;border-radius:3px;transition:.2s;font-weight:400;}
+.cam-fpanel .fapply:hover{background:#2c3258;}
+
+/* ── Acordeón ── */
+.cam-acc{border-bottom:1px solid var(--linea);}
+.cam-acc .acc-head{width:100%;display:flex;align-items:center;justify-content:space-between;padding:16px 22px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;color:var(--petroleo);transition:.2s;}
+.cam-acc .acc-head:hover{background:var(--crema-2);}
+.cam-acc .acc-head .sel{font-size:10px;letter-spacing:.04em;text-transform:none;color:var(--caramelo);font-weight:400;margin-left:auto;margin-right:10px;}
+.cam-acc .acc-head .arr{transition:transform .25s;opacity:.5;}
+.cam-acc.open .acc-head .arr{transform:rotate(180deg);}
+.cam-acc .acc-body{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.cam-acc .acc-inner{display:flex;flex-wrap:wrap;gap:7px;padding:0 22px 18px;}
+.cam-chip{background:#fff;border:1.5px solid rgba(33,40,66,.25);border-radius:30px;padding:7px 15px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;transition:.2s;color:var(--petroleo);font-weight:400;white-space:nowrap;}
+.cam-chip:hover{border-color:var(--caramelo);color:var(--caramelo);}
+.cam-chip.on{background:var(--petroleo);color:var(--crema);border-color:var(--petroleo);}
+
+.cam-nores{text-align:center;padding:70px 20px;opacity:.5;font-size:19px;font-weight:300;}
+
+/* ── Drawer carrito ── */
+.cam-drawer{
+  position:fixed;top:0;right:0;height:100%;width:420px;max-width:92vw;z-index:110;
+  background:var(--crema);box-shadow:-30px 0 60px -30px rgba(33,40,66,.6);
+  transform:translateX(100%);transition:transform .4s cubic-bezier(.3,.7,.2,1);display:flex;flex-direction:column;
+}
+.cam-drawer.show{transform:none;}
+.cam-drawer .dhead{background:var(--petroleo);color:var(--crema);padding:22px 24px;display:flex;justify-content:space-between;align-items:center;}
+.cam-drawer .dhead h3{font-weight:400;font-size:24px;}
+.cam-close{font-size:26px;line-height:1;opacity:.6;transition:.2s;}
+.cam-close:hover{opacity:1;transform:rotate(90deg);}
+.cam-drawer .ditems{flex:1;overflow:auto;padding:8px 24px;}
+.cam-ditem{display:flex;gap:14px;padding:18px 0;border-bottom:1px solid var(--linea);}
+.cam-ditem .thumb{width:58px;height:58px;border-radius:3px;overflow:hidden;flex:none;background:var(--crema-2);}
+.cam-ditem .thumb img,.cam-ditem .thumb svg{width:100%;height:100%;object-fit:cover;}
+.cam-ditem .info{flex:1;}
+.cam-ditem .info .n{font-size:17px;font-weight:400;line-height:1.1;}
+.cam-ditem .info .s{font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.55;margin-top:3px;font-weight:300;}
+.cam-ditem .right{display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;}
+.cam-ditem .right .p{font-size:17px;font-weight:500;}
+.cam-ditem .right .rm{font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.5;border-bottom:1px solid transparent;font-weight:300;}
+.cam-ditem .right .rm:hover{opacity:1;border-color:var(--vino);color:var(--vino);}
+.cam-empty{text-align:center;padding:60px 24px;opacity:.5;font-size:18px;font-weight:300;}
+.cam-dfoot{padding:24px;border-top:1px solid var(--linea);}
+.cam-dfoot .tot{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px;}
+.cam-dfoot .tot .l{font-size:11px;letter-spacing:.24em;text-transform:uppercase;opacity:.6;font-weight:400;}
+.cam-dfoot .tot .v{font-size:30px;font-weight:500;}
+.cam-dfoot button{width:100%;background:var(--vino);color:var(--crema);padding:16px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;border-radius:3px;transition:.25s;font-weight:400;}
+.cam-dfoot button:hover{background:var(--petroleo);}
+.cam-dfoot button:disabled{opacity:.35;cursor:not-allowed;}
+
+/* ── Confirmación ── */
+.cam-confirm{
+  position:fixed;inset:0;z-index:120;background:var(--petroleo);color:var(--crema);
+  display:flex;align-items:center;justify-content:center;padding:32px;text-align:center;
+  opacity:0;pointer-events:none;transition:opacity .4s;
+}
+.cam-confirm.show{opacity:1;pointer-events:auto;}
+.cam-confirm .inner{max-width:480px;}
+.cam-confirm .check{width:62px;height:62px;border:1px solid var(--caramelo);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:28px;color:var(--caramelo);}
+.cam-confirm .eyebrow{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:var(--caramelo);margin-bottom:16px;font-weight:400;}
+.cam-confirm h2{font-weight:300;font-size:42px;line-height:1;margin-bottom:10px;}
+.cam-confirm .num{font-size:26px;letter-spacing:.06em;margin:18px 0 0;padding:14px 0;font-weight:500;border-top:1px solid rgba(230,223,215,.2);border-bottom:1px solid rgba(230,223,215,.2);color:var(--caramelo);}
+.cam-confirm-list{text-align:left;margin:0 0 22px;padding:6px 0 16px;border-bottom:1px solid rgba(230,223,215,.2);}
+.cam-confirm-list .row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:7px 0;font-weight:300;}
+.cam-confirm-list .row .l{font-size:14px;line-height:1.3;}
+.cam-confirm-list .row .l .q{color:var(--caramelo);font-weight:500;}
+.cam-confirm-list .row .l .sz{font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.6;display:block;margin-top:1px;}
+.cam-confirm-list .row .p{font-size:15px;font-weight:400;white-space:nowrap;}
+.cam-confirm p{font-size:14px;line-height:1.7;opacity:.82;margin-bottom:8px;font-weight:300;}
+.cam-confirm p b{font-weight:500;}
+.cam-confirm .ig{font-size:23px;color:var(--crema);margin:6px 0 28px;letter-spacing:.04em;font-weight:400;}
+.cam-confirm .totline{font-size:13px;letter-spacing:.06em;opacity:.7;margin-bottom:26px;font-weight:300;}
+.cam-confirm button{background:transparent;color:var(--crema);border:1px solid rgba(230,223,215,.4);padding:14px 34px;font-size:11px;letter-spacing:.24em;text-transform:uppercase;border-radius:3px;transition:.25s;font-weight:400;}
+.cam-confirm button:hover{background:var(--crema);color:var(--petroleo);}
+
+/* ── Footer ── */
+.cam-foot{background:var(--petroleo);color:var(--crema);text-align:center;padding:46px 24px;}
+.cam-foot .n{font-size:28px;font-weight:500;}
+.cam-foot .l{font-size:11px;letter-spacing:.3em;text-transform:uppercase;opacity:.55;margin-top:10px;font-weight:300;}
+.cam-foot .note{font-size:11px;opacity:.4;margin-top:18px;letter-spacing:.04em;font-weight:300;}
+
+/* ── Toast ── */
+.cam-toast{
+  position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--petroleo);color:var(--crema);padding:13px 26px;border-radius:40px;font-size:13px;
+  letter-spacing:.06em;z-index:130;opacity:0;pointer-events:none;transition:.3s;font-weight:400;
+}
+.cam-toast.show{opacity:1;transform:translateX(-50%);}
+
+/* ── Error ── */
+#cam-error{
+  position:fixed;inset:0;z-index:200;background:var(--crema);
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:32px;
+}
+#cam-error .ico{font-size:48px;opacity:.4;}
+#cam-error h3{font-weight:300;font-size:28px;}
+#cam-error p{font-size:14px;opacity:.6;max-width:380px;}
+#cam-error button{margin-top:8px;padding:12px 28px;background:var(--petroleo);color:var(--crema);border-radius:40px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;}
+
+/* ── Responsive ── */
+@media(max-width:680px){
+  .cam-sec{padding:30px 14px;}
+  .cam-hero{padding:44px 18px 36px;}
+  .cam-head{padding:12px 16px;}
+  .cam-card .body{padding:12px 11px 14px;}
+  .cam-card .marca{font-size:11px;letter-spacing:.14em;}
+  .cam-card .nombre{font-size:16px;}
+  .cam-card .meta{gap:4px;font-size:9px;}
+  .cam-card .meta .pill{padding:2px 8px;}
+  .cam-card .sizes{gap:5px;margin-top:10px;}
+  .cam-size{padding:6px 2px;}
+  .cam-size .pr{font-size:13px;}
+  .cam-card .dupe{font-size:11px;}
+  .cam-tools{top:53px;padding:8px 12px 8px;}
+  .cam-search{padding:6px 13px;gap:8px;border-radius:30px;}
+  .cam-search svg{width:14px;height:14px;}
+  .cam-search input{font-size:12px;}
+  .cam-filterbtn{padding:8px 14px;font-size:10px;letter-spacing:.08em;}
+  .cam-head .cam-brand .name{font-size:22px;}
+  .cam-head .cam-brand .tag{font-size:8px;letter-spacing:.3em;}
+  .cam-sec-head h2{font-size:26px;}
+  .cam-sec-head .sub{font-size:9px;margin-bottom:5px;}
+  #cam-catalog{padding-top:18px!important;}
+  .cam-grid{grid-template-columns:repeat(2,1fr);gap:12px;}
+}
+@media(max-width:380px){
+  .cam-sec{padding:26px 10px;}
+  .cam-grid{gap:9px;}
+  .cam-card .nombre{font-size:15px;}
+  .cam-tools{top:51px;}
+}
+</style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="cam-loading">
+  <div class="spinner"></div>
+  <p>Cargando catálogo…</p>
+</div>
+
+<!-- Error -->
+<div id="cam-error">
+  <div class="ico">⚠️</div>
+  <h3>No se pudo cargar el catálogo</h3>
+  <p>Hubo un problema al conectarse con la base de datos. Por favor intenta nuevamente.</p>
+  <button onclick="initApp()">Reintentar</button>
+</div>
+
+<!-- App -->
+<div id="cam-app" style="display:none;">
+
+<header class="cam-head">
+  <div class="cam-brand"><span class="name">CAM Parfums</span><span class="tag">Maison de Decants</span></div>
+  <button class="cam-cartbtn" id="cam-open-cart">Pedido <span class="dot" id="cam-cart-count">0</span></button>
+</header>
+
+<div class="cam-tools">
+  <div class="cam-toolsin">
+    <div class="cam-toolsrow">
+      <div class="cam-search" id="cam-searchbox">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+        <input id="cam-search" placeholder="Buscar por nombre, marca o dupe…" autocomplete="off">
+        <button class="clear" id="cam-clear">&times;</button>
+      </div>
+      <button class="cam-filterbtn" id="cam-open-filters">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
+        Filtros<span class="fcount" id="cam-fcount" style="display:none;">0</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Panel lateral -->
+<div class="cam-fpanel" id="cam-fpanel">
+  <div class="fhead"><h3>Filtros</h3><button class="cam-close" id="cam-close-filters">&times;</button></div>
+  <div class="fbody" id="cam-filters"></div>
+  <div class="ffoot">
+    <button class="fclear" id="cam-clear-filters">Limpiar filtros</button>
+    <button class="fapply" id="cam-apply-filters">Ver resultados</button>
+  </div>
+</div>
+<div class="cam-fscrim" id="cam-fscrim"></div>
+
+<section class="cam-sec" id="cam-catalog" style="padding-top:26px;">
+  <div class="cam-sec-head">
+    <span class="sub">Explora</span>
+    <h2 id="cam-cat-title">Catálogo completo</h2>
+    <span class="count" id="cam-cat-count"></span>
+  </div>
+  <div class="cam-grid" id="cam-all"></div>
+  <div class="cam-nores" id="cam-nores" style="display:none;">Sin resultados para tu búsqueda.</div>
+</section>
+
+<footer class="cam-foot">
+  <div class="n">CAM Parfums</div>
+  <div class="l">@camparfums</div>
+  <div class="note">Los precios son referenciales · confirma disponibilidad por DM</div>
+</footer>
+
+<!-- Drawer carrito -->
+<div class="cam-drawer" id="cam-drawer">
+  <div class="dhead"><h3>Tu pedido</h3><button class="cam-close" id="cam-close-cart">&times;</button></div>
+  <div class="ditems" id="cam-ditems"></div>
+  <div class="cam-dfoot">
+    <div class="tot"><span class="l">Total estimado</span><span class="v" id="cam-total">$0</span></div>
+    <button id="cam-checkout" disabled>Generar pedido</button>
+  </div>
+</div>
+
+<!-- Confirmación -->
+<div class="cam-confirm" id="cam-confirm">
+  <div class="inner">
+    <div class="check">✓</div>
+    <div class="eyebrow">Pedido generado</div>
+    <h2>¡Gracias por tu pedido!</h2>
+    <div class="num" id="cam-ordernum">#CAM-0000</div>
+    <div class="cam-confirm-list" id="cam-confirm-list"></div>
+    <p>Para <b>confirmar tu pedido</b> y coordinar el pago, escríbenos por DM de Instagram:</p>
+    <div class="ig">@camparfums</div>
+    <div class="totline" id="cam-confirm-tot"></div>
+    <button id="cam-confirm-close">Seguir explorando</button>
+  </div>
+</div>
+
+<div class="cam-toast" id="cam-toast"></div>
+
+</div><!-- /cam-app -->
+
+<script>
+/* ─────────────────────────────────────────────────
+   CONFIGURACIÓN
+───────────────────────────────────────────────── */
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyfa4cgTgeCLx2LyHSvfIkgKLa5uUGRsc6YiIeDOQGnBe8Dsoa2UX_bOrBA-8g_IugdyA/exec';
+
+const SIZES = ['1.5 ml','3 ml','5 ml','10 ml'];
+const PRICE_KEYS = ['precio_1_5','precio_3','precio_5','precio_10'];
+const peso = n => n ? '$'+n.toLocaleString('es-CL') : '—';
+
+let PRODUCTS = [];
+let cart = [];
+
+/* ─────────────────────────────────────────────────
+   INIT — carga catálogo desde Apps Script
+───────────────────────────────────────────────── */
+async function initApp() {
+  const loading = document.getElementById('cam-loading');
+  const error   = document.getElementById('cam-error');
+  const app     = document.getElementById('cam-app');
+
+  loading.style.display = 'flex';
+  loading.classList.remove('fade-out');
+  error.style.display = 'none';
+  app.style.display   = 'none';
+
+  try {
+    const res  = await fetch(SCRIPT_URL);
+    const data = await res.json();
+
+    if (!data.ok || !data.productos) throw new Error('Respuesta inválida');
+
+    // Mapear campos del script a los esperados por el renderer
+    PRODUCTS = data.productos
+      .filter(p => p.estado === 'activo' || !p.estado) // solo activos
+      .map(p => ({
+        sku    : p.sku,
+        marca  : p.marca,
+        nombre : p.nombre,
+        conc   : p.concentracion,
+        fam    : p.familia,
+        gen    : p.masculino ? 'Masculino' : p.femenino ? 'Femenino' : 'Unisex',
+        excl   : p.exclusivo,
+        dupe   : p.dupe || '',
+        precios: [p.precio_1_5, p.precio_3, p.precio_5, p.precio_10],
+        img    : p.foto ? p.foto.replace(/drive\.google\.com\/uc\?id=([^&]+).*/, 'drive.google.com/thumbnail?id=$1&sz=w400') : ''
+      }));
+
+    // Mostrar app
+    loading.classList.add('fade-out');
+    setTimeout(() => { loading.style.display = 'none'; app.style.display = 'block'; }, 500);
+
+    buildFilters();
+    applyFilters();
+    updateCart();
+    bindEvents();
+
+  } catch(e) {
+    console.error(e);
+    loading.style.display = 'none';
+    error.style.display   = 'flex';
+  }
+}
+
+/* ─────────────────────────────────────────────────
+   PLACEHOLDER SVG
+───────────────────────────────────────────────── */
+function placeholder(p) {
+  const initials = p.marca.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  return `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="g${p.sku}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#efeae4"/></linearGradient></defs>
+    <rect width="100" height="100" fill="url(#g${p.sku})"/>
+    <g fill="none" stroke="#212842" stroke-opacity=".5">
+      <rect x="38" y="34" width="24" height="40" rx="3" stroke-width="1.1"/>
+      <rect x="44" y="26" width="12" height="9" rx="1.5" stroke-width="1.1"/>
+      <line x1="42" y1="48" x2="58" y2="48" stroke-width=".7" stroke-opacity=".3"/>
+    </g>
+    <text x="50" y="56" text-anchor="middle" font-family="Jost,sans-serif" font-size="9" font-weight="500" fill="#B38C6A" letter-spacing="1">${initials}</text>
+    <text x="50" y="86" text-anchor="middle" font-family="Jost,sans-serif" font-size="4.4" font-weight="400" fill="#212842" fill-opacity=".55" letter-spacing="1.5">CAM PARFUMS</text>
+  </svg>`;
+}
+function media(p) { return p.img ? `<img src="${p.img}" alt="${p.nombre}" loading="lazy">` : placeholder(p); }
+
+/* ─────────────────────────────────────────────────
+   CARD
+───────────────────────────────────────────────── */
+function card(p) {
+  const badge = p.excl ? '<span class="cam-badge excl">Exclusivo</span>' : '';
+  const famCls = ['Diseñador','Árabe','Nicho'].includes(p.fam) ? 'f-'+p.fam : 'f-otro';
+  const concCls = ({'Extrait':'c-Extrait','Parfum':'c-Parfum','Elixir':'c-Elixir','EDP':'c-EDP','EDT':'c-EDT'})[p.conc] || 'c-otro';
+  const meta = `<span class="pill m-conc ${concCls}">${p.conc}</span>`
+             + `<span class="pill m-fam ${famCls}">${p.fam}</span>`
+             + `<span class="pill m-gen g-${p.gen}">${p.gen}</span>`;
+  const sizes = SIZES.map((s,i) => p.precios[i] > 0
+    ? `<button class="cam-size" data-sku="${p.sku}" data-i="${i}"><span class="sz">${s}</span><span class="pr">${peso(p.precios[i])}</span></button>`
+    : '').join('');
+  return `<article class="cam-card">
+    <div class="imgwrap">${badge}${media(p)}</div>
+    <div class="body">
+      <div class="marca">${p.marca}</div>
+      <div class="nombre">${p.nombre}</div>
+      <div class="meta">${meta}</div>
+      ${p.dupe ? `<div class="dupe">insp. <b>${p.dupe}</b></div>` : ''}
+      <div class="sizes">${sizes}</div>
+    </div>
+  </article>`;
+}
+function render(list, el) { document.getElementById(el).innerHTML = list.map(card).join(''); }
+
+/* ─────────────────────────────────────────────────
+   FILTROS
+───────────────────────────────────────────────── */
+const state = {q:'', Marca:'Todas', Género:'Todos', Familia:'Todas', Dupe:'Todos'};
+
+function buildFilters() {
+  const marcas = ['Todas',...[...new Set(PRODUCTS.map(p=>p.marca))].sort((a,b)=>a.localeCompare(b))];
+  const rows = [
+    ['Marca','Marca', marcas,'Todas'],
+    ['Género','Género',['Todos','Masculino','Femenino','Unisex'],'Todos'],
+    ['Familia','Familia',['Todas','Diseñador','Árabe','Nicho'],'Todas'],
+    ['Dupe','Dupe',['Todos','Solo dupes','Sin dupe'],'Todos'],
+  ];
+  document.getElementById('cam-filters').innerHTML = rows.map(([lab,key,vals,def],idx) => {
+    const active = state[key] !== def;
+    const sel    = active ? state[key] : '';
+    const open   = active ? ' open' : '';
+    return `<div class="cam-acc${open}" data-acc="${idx}">
+      <button class="acc-head" data-acc="${idx}">${lab}
+        <span class="sel">${sel}</span>
+        <svg class="arr" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="acc-body"><div class="acc-inner">
+        ${vals.map(v=>`<button class="cam-chip ${state[key]===v?'on':''}" data-key="${key}" data-val="${v}">${v}</button>`).join('')}
+      </div></div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('.cam-acc.open .acc-body').forEach(b=>b.style.maxHeight=b.scrollHeight+'px');
+  updateFcount();
+}
+
+function updateFcount() {
+  const def = {Marca:'Todas','Género':'Todos',Familia:'Todas',Dupe:'Todos'};
+  const n = Object.keys(def).filter(k=>state[k]!==def[k]).length;
+  const el = document.getElementById('cam-fcount');
+  el.textContent = n; el.style.display = n ? 'flex' : 'none';
+}
+
+function matchDupe(p) {
+  if (state.Dupe === 'Solo dupes') return !!p.dupe;
+  if (state.Dupe === 'Sin dupe')  return !p.dupe;
+  return true;
+}
+
+function applyFilters() {
+  const q = state.q.trim().toLowerCase();
+  const f = PRODUCTS.filter(p =>
+    (state.Marca   === 'Todas'   || p.marca === state.Marca)  &&
+    (state.Género  === 'Todos'   || p.gen   === state.Género) &&
+    (state.Familia === 'Todas'   || p.fam   === state.Familia) &&
+    matchDupe(p) &&
+    (!q || (p.nombre+' '+p.marca+' '+p.dupe+' '+p.conc).toLowerCase().includes(q))
+  );
+  render(f,'cam-all');
+  let title = 'Catálogo completo';
+  if (state.Marca   !== 'Todas')     title = state.Marca;
+  else if (state.Familia !== 'Todas') title = 'Familia '+state.Familia;
+  else if (state.Género  !== 'Todos') title = state.Género;
+  else if (state.Dupe === 'Solo dupes') title = 'Dupes';
+  else if (state.q.trim())            title = 'Resultados';
+  document.getElementById('cam-cat-title').textContent = title;
+  document.getElementById('cam-cat-count').textContent = f.length+' de '+PRODUCTS.length+' fragancias';
+  document.getElementById('cam-nores').style.display = f.length ? 'none' : 'block';
+  syncAdded();
+}
+
+/* ─────────────────────────────────────────────────
+   CARRITO
+───────────────────────────────────────────────── */
+function addItem(sku, i) {
+  const p    = PRODUCTS.find(x=>x.sku===sku);
+  const size = SIZES[i];
+  // Si ya está → quitar última unidad (deseleccionar)
+  let idx = -1;
+  for (let j = cart.length - 1; j >= 0; j--) {
+    if (cart[j].sku === sku && cart[j].size === size) { idx = j; break; }
+  }
+  if (idx !== -1) {
+    cart.splice(idx, 1);
+    updateCart(); syncAdded();
+    toast(`${p.nombre} · ${size} quitado`);
+    return;
+  }
+  cart.push({sku, nombre:p.nombre, marca:p.marca, img:p.img, ph:p.img?'':placeholder(p), size, precio:p.precios[i]});
+  updateCart(); syncAdded();
+  toast(`${p.nombre} · ${size} añadido`);
+}
+
+function syncAdded() {
+  document.querySelectorAll('.cam-size').forEach(b => {
+    const has = cart.some(c=>c.sku===b.dataset.sku && c.size===SIZES[+b.dataset.i]);
+    b.classList.toggle('added', has);
+  });
+}
+
+function updateCart() {
+  document.getElementById('cam-cart-count').textContent = cart.length;
+  const tot = cart.reduce((s,i)=>s+i.precio, 0);
+  document.getElementById('cam-total').textContent = peso(tot)||'$0';
+  document.getElementById('cam-checkout').disabled = cart.length === 0;
+  const box = document.getElementById('cam-ditems');
+  if (!cart.length) { box.innerHTML='<div class="cam-empty">Tu pedido está vacío.<br>Toca un tamaño para añadirlo.</div>'; return; }
+  box.innerHTML = cart.map((it,idx)=>`<div class="cam-ditem">
+    <div class="thumb">${it.img?`<img src="${it.img}">`:it.ph}</div>
+    <div class="info"><div class="n">${it.nombre}</div><div class="s">${it.marca} · ${it.size}</div></div>
+    <div class="right"><div class="p">${peso(it.precio)}</div><button class="rm" data-idx="${idx}">Quitar</button></div>
+  </div>`).join('');
+  box.querySelectorAll('.rm').forEach(b=>b.onclick=()=>{cart.splice(+b.dataset.idx,1);updateCart();syncAdded();});
+}
+
+function openCart()  { document.getElementById('cam-drawer').classList.add('show'); }
+function closeCart() { document.getElementById('cam-drawer').classList.remove('show'); }
+
+function checkout() {
+  const tot = cart.reduce((s,i)=>s+i.precio, 0);
+  const num = '#CAM-'+String(Math.floor(1000+Math.random()*9000));
+  document.getElementById('cam-ordernum').textContent = num;
+  const groups = {};
+  cart.forEach(it => {
+    const k = it.nombre+'|'+it.size;
+    if (!groups[k]) groups[k]={marca:it.marca,nombre:it.nombre,size:it.size,precio:it.precio,qty:0};
+    groups[k].qty++;
+  });
+  document.getElementById('cam-confirm-list').innerHTML = Object.values(groups).map(g=>
+    `<div class="row"><div class="l"><span class="q">${g.qty}×</span> ${g.marca} — ${g.nombre}<span class="sz">${g.size}</span></div>`
+    +`<div class="p">${peso(g.precio*g.qty)}</div></div>`).join('');
+  document.getElementById('cam-confirm-tot').textContent = cart.length+' decant(s) · Total estimado '+peso(tot);
+  closeCart();
+  document.getElementById('cam-confirm').classList.add('show');
+  cart = []; updateCart(); syncAdded();
+
+  // Registrar pedido en Apps Script (async, sin bloquear UI)
+  const body = { cliente:'Web', items: Object.values(groups).map(g=>({sku:'',nombre:g.nombre,tamano:g.size,cantidad:g.qty,valorUnitario:g.precio})) };
+  fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(body) }).catch(()=>{});
+}
+
+/* ─────────────────────────────────────────────────
+   TOAST
+───────────────────────────────────────────────── */
+let toastT;
+function toast(msg) {
+  const t = document.getElementById('cam-toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+/* ─────────────────────────────────────────────────
+   EVENTOS
+───────────────────────────────────────────────── */
+function bindEvents() {
+  // Carrito
+  document.getElementById('cam-open-cart').onclick  = openCart;
+  document.getElementById('cam-close-cart').onclick = closeCart;
+  document.getElementById('cam-checkout').onclick   = checkout;
+  document.getElementById('cam-confirm-close').onclick = ()=>document.getElementById('cam-confirm').classList.remove('show');
+
+  // Búsqueda
+  const search = document.getElementById('cam-search');
+  search.addEventListener('input', () => {
+    state.q = search.value;
+    document.getElementById('cam-searchbox').classList.toggle('has', !!search.value);
+    applyFilters();
+  });
+  document.getElementById('cam-clear').onclick = ()=>{
+    search.value=''; state.q='';
+    document.getElementById('cam-searchbox').classList.remove('has');
+    applyFilters(); search.focus();
+  };
+
+  // Panel filtros
+  function openFilters()  { document.getElementById('cam-fpanel').classList.add('show'); document.getElementById('cam-fscrim').classList.add('show'); }
+  function closeFilters() { document.getElementById('cam-fpanel').classList.remove('show'); document.getElementById('cam-fscrim').classList.remove('show'); }
+  document.getElementById('cam-open-filters').onclick  = openFilters;
+  document.getElementById('cam-close-filters').onclick = closeFilters;
+  document.getElementById('cam-fscrim').onclick        = closeFilters;
+  document.getElementById('cam-apply-filters').onclick = closeFilters;
+  document.getElementById('cam-clear-filters').onclick = ()=>{
+    state.Marca='Todas'; state['Género']='Todos'; state.Familia='Todas'; state.Dupe='Todos';
+    buildFilters(); applyFilters();
+  };
+
+  // Clicks globales (tamaños + acordeón + chips)
+  document.addEventListener('click', e => {
+    const sz = e.target.closest('.cam-size');
+    if (sz) { addItem(sz.dataset.sku, +sz.dataset.i); return; }
+
+    const acc = e.target.closest('.acc-head');
+    if (acc) {
+      const wrap  = acc.closest('.cam-acc');
+      const body  = wrap.querySelector('.acc-body');
+      const isOpen = wrap.classList.toggle('open');
+      body.style.maxHeight = isOpen ? body.scrollHeight+'px' : '0';
+      return;
+    }
+
+    const chip = e.target.closest('.cam-chip');
+    if (chip) {
+      state[chip.dataset.key] = chip.dataset.val;
+      chip.closest('.acc-inner').querySelectorAll('.cam-chip').forEach(c=>c.classList.remove('on'));
+      chip.classList.add('on');
+      const def = {Marca:'Todas','Género':'Todos',Familia:'Todas',Dupe:'Todos'};
+      const head = chip.closest('.cam-acc').querySelector('.acc-head .sel');
+      head.textContent = state[chip.dataset.key] !== def[chip.dataset.key] ? chip.dataset.val : '';
+      updateFcount(); applyFilters();
+      return;
+    }
+  });
+}
+
+/* ─────────────────────────────────────────────────
+   ARRANQUE
+───────────────────────────────────────────────── */
+initApp();
+</script>
+</body>
+</html>
