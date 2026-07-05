@@ -228,6 +228,27 @@ input{font-family:var(--f);outline:none;}
 .cam-foot .l{font-size:11px;letter-spacing:.3em;text-transform:uppercase;opacity:.55;margin-top:10px;font-weight:300;}
 .cam-foot .note{font-size:11px;opacity:.4;margin-top:18px;letter-spacing:.04em;font-weight:300;}
 
+/* ── Campo nombre ── */
+.cam-namewrap{margin-bottom:12px;}
+.cam-namelabel{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.6;margin-bottom:6px;font-weight:400;}
+.cam-nameinput{
+  width:100%;border:1px solid var(--linea);border-radius:3px;padding:11px 14px;
+  font-size:15px;font-weight:300;color:var(--petroleo);background:#fff;transition:.2s;
+}
+.cam-nameinput:focus{border-color:var(--caramelo);outline:none;}
+.cam-nameinput.err{border-color:var(--vino);}
+.cam-name-err{font-size:11px;color:var(--vino);margin-top:5px;letter-spacing:.04em;}
+
+/* ── Banner screenshot ── */
+.cam-screenshot-banner{
+  display:flex;align-items:flex-start;gap:14px;
+  background:var(--caramelo);color:var(--petroleo);
+  border-radius:6px;padding:16px 18px;margin:20px 0 18px;text-align:left;
+}
+.ssb-icon{font-size:28px;flex:none;line-height:1;}
+.ssb-text{font-size:13px;line-height:1.55;font-weight:300;}
+.ssb-text strong{display:block;font-size:15px;font-weight:600;margin-bottom:4px;letter-spacing:.01em;}
+
 /* ── Toast ── */
 .cam-toast{
   position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);
@@ -343,7 +364,7 @@ input{font-family:var(--f);outline:none;}
 
 <footer class="cam-foot">
   <div class="n">CAM Parfums</div>
-  <div class="l">@camparfums</div>
+  <div class="l">@cam.parfums</div>
   <div class="note">Los precios son referenciales · confirma disponibilidad por DM</div>
 </footer>
 
@@ -353,6 +374,11 @@ input{font-family:var(--f);outline:none;}
   <div class="ditems" id="cam-ditems"></div>
   <div class="cam-dfoot">
     <div class="tot"><span class="l">Total estimado</span><span class="v" id="cam-total">$0</span></div>
+    <div class="cam-namewrap">
+      <label class="cam-namelabel" for="cam-nombre">Tu nombre o alias <span style="color:var(--vino)">*</span></label>
+      <input id="cam-nombre" class="cam-nameinput" type="text" placeholder="Ej: Camilo, CamiLP…" autocomplete="off" maxlength="40">
+      <div id="cam-nombre-err" class="cam-name-err" style="display:none;">Ingresa un nombre para continuar</div>
+    </div>
     <button id="cam-checkout" disabled>Generar pedido</button>
   </div>
 </div>
@@ -365,8 +391,14 @@ input{font-family:var(--f);outline:none;}
     <h2>¡Gracias por tu pedido!</h2>
     <div class="num" id="cam-ordernum">#CAM-0000</div>
     <div class="cam-confirm-list" id="cam-confirm-list"></div>
-    <p>Para <b>confirmar tu pedido</b> y coordinar el pago, escríbenos por DM de Instagram:</p>
-    <div class="ig">@camparfums</div>
+    <div class="cam-screenshot-banner">
+      <div class="ssb-icon">📸</div>
+      <div class="ssb-text">
+        <strong>Toma un screenshot de esta pantalla</strong>
+        y envíalo por DM a Instagram para confirmar tu pedido y coordinar el pago.
+      </div>
+    </div>
+    <div class="ig">@cam.parfums</div>
     <div class="totline" id="cam-confirm-tot"></div>
     <button id="cam-confirm-close">Seguir explorando</button>
   </div>
@@ -569,7 +601,7 @@ function addItem(sku, i) {
     toast(`${p.nombre} · ${size} quitado`);
     return;
   }
-  cart.push({sku, nombre:p.nombre, marca:p.marca, img:p.img, ph:p.img?'':placeholder(p), size, precio:p.precios[i]});
+  cart.push({sku, nombre:p.nombre, marca:p.marca, conc:p.conc, img:p.img, ph:p.img?'':placeholder(p), size, precio:p.precios[i]});
   updateCart(); syncAdded();
   toast(`${p.nombre} · ${size} añadido`);
 }
@@ -600,25 +632,39 @@ function openCart()  { document.getElementById('cam-drawer').classList.add('show
 function closeCart() { document.getElementById('cam-drawer').classList.remove('show'); }
 
 function checkout() {
+  // Validar nombre
+  const nombreInput = document.getElementById('cam-nombre');
+  const nombreErr   = document.getElementById('cam-nombre-err');
+  const nombre = nombreInput.value.trim();
+  if (!nombre) {
+    nombreInput.classList.add('err');
+    nombreErr.style.display = 'block';
+    nombreInput.focus();
+    return;
+  }
+  nombreInput.classList.remove('err');
+  nombreErr.style.display = 'none';
+
   const tot = cart.reduce((s,i)=>s+i.precio, 0);
   const num = '#CAM-'+String(Math.floor(1000+Math.random()*9000));
   document.getElementById('cam-ordernum').textContent = num;
   const groups = {};
   cart.forEach(it => {
     const k = it.nombre+'|'+it.size;
-    if (!groups[k]) groups[k]={marca:it.marca,nombre:it.nombre,size:it.size,precio:it.precio,qty:0};
+    if (!groups[k]) groups[k]={marca:it.marca,nombre:it.nombre,conc:it.conc,size:it.size,precio:it.precio,qty:0};
     groups[k].qty++;
   });
   document.getElementById('cam-confirm-list').innerHTML = Object.values(groups).map(g=>
-    `<div class="row"><div class="l"><span class="q">${g.qty}×</span> ${g.marca} — ${g.nombre}<span class="sz">${g.size}</span></div>`
+    `<div class="row"><div class="l"><span class="q">${g.qty}×</span> ${g.marca} — ${g.nombre}<span class="sz">${g.conc ? g.conc+' · ' : ''}${g.size}</span></div>`
     +`<div class="p">${peso(g.precio*g.qty)}</div></div>`).join('');
   document.getElementById('cam-confirm-tot').textContent = cart.length+' decant(s) · Total estimado '+peso(tot);
   closeCart();
   document.getElementById('cam-confirm').classList.add('show');
   cart = []; updateCart(); syncAdded();
+  nombreInput.value = '';
 
   // Registrar pedido en Apps Script (async, sin bloquear UI)
-  const body = { cliente:'Web', items: Object.values(groups).map(g=>({sku:'',nombre:g.nombre,tamano:g.size,cantidad:g.qty,valorUnitario:g.precio})) };
+  const body = { cliente: nombre, numero: num, items: Object.values(groups).map(g=>({sku:'',nombre:g.nombre,concentracion:g.conc||'',tamano:g.size,cantidad:g.qty,valorUnitario:g.precio})) };
   fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(body) }).catch(()=>{});
 }
 
