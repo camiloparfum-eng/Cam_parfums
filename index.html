@@ -734,7 +734,8 @@ function switchVista(v) {
   document.getElementById('btn-frascos').classList.toggle('active', v==='frascos');
   document.getElementById('cam-catalog').style.display  = v==='decants' ? '' : 'none';
   document.getElementById('cam-frascos').style.display  = v==='frascos' ? '' : 'none';
-  document.getElementById('cam-tools').style.display    = v==='decants' ? '' : 'none';
+  const tools = document.getElementById('cam-tools');
+  if (tools) tools.style.display = v==='decants' ? '' : 'none';
   if (v==='frascos' && !frascosCargados) cargarFrascos();
 }
 
@@ -904,3 +905,4 @@ initApp();
 </script>
 </body>
 </html>
+
