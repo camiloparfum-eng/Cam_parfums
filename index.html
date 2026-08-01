@@ -206,11 +206,11 @@ input{font-family:var(--f);outline:none;}
 .cam-confirm.show{opacity:1;pointer-events:auto;}
 .cam-confirm .inner{max-width:480px;}
 .cam-confirm .check{width:62px;height:62px;border:1px solid var(--caramelo);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:28px;color:var(--caramelo);}
-.cam-confirm .eyebrow{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:var(--caramelo);margin-bottom:16px;font-weight:400;}
-.cam-confirm h2{font-weight:300;font-size:42px;line-height:1;margin-bottom:10px;}
+.cam-confirm .eyebrow{font-size:18px;letter-spacing:.2em;text-transform:uppercase;color:var(--caramelo);margin-bottom:16px;font-weight:500;}
+.cam-confirm h2{font-weight:300;font-size:28px;line-height:1;margin-bottom:8px;}
 .cam-confirm .num{font-size:26px;letter-spacing:.06em;margin:18px 0 0;padding:14px 0;font-weight:500;border-top:1px solid rgba(230,223,215,.2);border-bottom:1px solid rgba(230,223,215,.2);color:var(--caramelo);}
 .cam-confirm-list{text-align:left;margin:0 0 22px;padding:6px 0 16px;border-bottom:1px solid rgba(230,223,215,.2);}
-.cam-confirm-list .row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:7px 0;font-weight:300;}
+.cam-confirm-list .row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:4px 0;font-weight:300;}
 .cam-confirm-list .row .l{font-size:14px;line-height:1.3;}
 .cam-confirm-list .row .l .q{color:var(--caramelo);font-weight:500;}
 .cam-confirm-list .row .l .sz{font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.6;display:block;margin-top:1px;}
@@ -227,6 +227,49 @@ input{font-family:var(--f);outline:none;}
 .cam-foot .n{font-size:28px;font-weight:500;}
 .cam-foot .l{font-size:11px;letter-spacing:.3em;text-transform:uppercase;opacity:.55;margin-top:10px;font-weight:300;}
 .cam-foot .note{font-size:11px;opacity:.4;margin-top:18px;letter-spacing:.04em;font-weight:300;}
+
+/* ── Toggle Decants / Frascos ── */
+.cam-toggle{display:flex;gap:4px;background:rgba(255,255,255,.1);border-radius:40px;padding:4px;}
+.cam-toggle-btn{
+  padding:7px 16px;border-radius:40px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:400;color:rgba(240,231,213,.6);transition:.2s;
+}
+.cam-toggle-btn.active{background:var(--caramelo);color:var(--petroleo);font-weight:500;}
+@media(max-width:680px){
+  .cam-toggle-btn{padding:5px 11px;font-size:10px;}
+}
+
+/* ── Card frasco ── */
+.cam-frasco-card{
+  background:var(--crema-2);border:1px solid var(--linea);border-radius:4px;overflow:hidden;
+  display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.2,.7,.3,1),box-shadow .35s;position:relative;
+}
+.cam-frasco-card:hover{transform:translateY(-5px);box-shadow:0 22px 40px -26px rgba(33,40,66,.5);}
+.cam-frasco-card .imgwrap{
+  aspect-ratio:1/1;background:radial-gradient(80% 80% at 50% 35%,#fff,var(--crema-2));
+  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
+}
+.cam-frasco-card .imgwrap img{width:100%;height:100%;object-fit:cover;}
+.cam-frasco-card .imgwrap svg{width:100%;height:100%;}
+.cam-frasco-card .body{padding:16px 16px 18px;border-top:1px solid var(--linea);display:flex;flex-direction:column;flex:1;}
+.cam-frasco-card .marca{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--caramelo);font-weight:500;}
+.cam-frasco-card .nombre{font-size:20px;font-weight:400;line-height:1.1;margin:5px 0 6px;}
+.cam-frasco-card .meta{font-size:10px;letter-spacing:.04em;text-transform:uppercase;margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-weight:400;margin-bottom:10px;}
+.cam-frasco-card .meta .pill{padding:2px 11px;border-radius:20px;line-height:1.5;}
+.cam-frasco-info{font-size:12px;opacity:.65;margin-bottom:10px;display:flex;gap:12px;flex-wrap:wrap;}
+.cam-frasco-info span{display:flex;align-items:center;gap:4px;}
+.cam-frasco-precio{margin-top:auto;}
+.cam-frasco-precio .etiqueta{font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.55;margin-bottom:4px;font-weight:400;}
+.cam-frasco-precio .valor{font-size:24px;font-weight:500;color:var(--petroleo);}
+.cam-frasco-btn{
+  margin-top:12px;width:100%;background:var(--vino);color:var(--crema);
+  padding:12px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  border-radius:3px;transition:.25s;font-weight:400;
+}
+.cam-frasco-btn:hover{background:var(--petroleo);}
+.cam-frasco-btn.added{background:var(--caramelo);color:var(--petroleo);}
+.badge-cond-sellado{background:var(--petroleo);color:var(--crema);}
+.badge-cond-parcial{background:var(--caramelo);color:var(--petroleo);}
 
 /* ── Campo nombre ── */
 .cam-namewrap{margin-bottom:12px;}
@@ -245,9 +288,8 @@ input{font-family:var(--f);outline:none;}
   background:var(--caramelo);color:var(--petroleo);
   border-radius:6px;padding:16px 18px;margin:20px 0 18px;text-align:left;
 }
-.ssb-icon{font-size:28px;flex:none;line-height:1;}
-.ssb-text{font-size:13px;line-height:1.55;font-weight:300;}
-.ssb-text strong{display:block;font-size:15px;font-weight:600;margin-bottom:4px;letter-spacing:.01em;}
+.ssb-text{font-size:19px;line-height:1.5;font-weight:300;}
+.ssb-text strong{display:block;font-size:21px;font-weight:600;margin-bottom:6px;letter-spacing:.01em;}
 
 /* ── Toast ── */
 .cam-toast{
@@ -322,6 +364,10 @@ input{font-family:var(--f);outline:none;}
 
 <header class="cam-head">
   <div class="cam-brand"><span class="name">CAM Parfums</span><span class="tag">Maison de Decants</span></div>
+  <div class="cam-toggle">
+    <button class="cam-toggle-btn active" id="btn-decants" onclick="switchVista('decants')">Decants</button>
+    <button class="cam-toggle-btn" id="btn-frascos" onclick="switchVista('frascos')">Frascos</button>
+  </div>
   <button class="cam-cartbtn" id="cam-open-cart">Pedido <span class="dot" id="cam-cart-count">0</span></button>
 </header>
 
@@ -362,6 +408,18 @@ input{font-family:var(--f);outline:none;}
   <div class="cam-nores" id="cam-nores" style="display:none;">Sin resultados para tu búsqueda.</div>
 </section>
 
+<!-- Sección frascos -->
+<section class="cam-sec" id="cam-frascos" style="display:none;padding-top:26px;">
+  <div class="cam-sec-head">
+    <span class="sub">Colección</span>
+    <h2 id="cam-frascos-title">Frascos disponibles</h2>
+    <span class="count" id="cam-frascos-count"></span>
+  </div>
+  <div id="cam-frascos-loading" style="text-align:center;padding:60px 20px;opacity:.5;font-size:14px;letter-spacing:.1em;">Cargando frascos…</div>
+  <div class="cam-grid" id="cam-frascos-all" style="display:none;"></div>
+  <div class="cam-nores" id="cam-frascos-nores" style="display:none;">Sin frascos disponibles por el momento.</div>
+</section>
+
 <footer class="cam-foot">
   <div class="n">CAM Parfums</div>
   <div class="l">@cam.parfums</div>
@@ -386,20 +444,16 @@ input{font-family:var(--f);outline:none;}
 <!-- Confirmación -->
 <div class="cam-confirm" id="cam-confirm">
   <div class="inner">
-    <div class="check">✓</div>
-    <div class="eyebrow">Pedido generado</div>
-    <h2>¡Gracias por tu pedido!</h2>
-    <div class="num" id="cam-ordernum">#CAM-0000</div>
+    <div class="eyebrow">Detalle pedido</div>
     <div class="cam-confirm-list" id="cam-confirm-list"></div>
+    <div class="totline" id="cam-confirm-tot"></div>
     <div class="cam-screenshot-banner">
-      <div class="ssb-icon">📸</div>
       <div class="ssb-text">
         <strong>Toma un screenshot de esta pantalla</strong>
         y envíalo por DM a Instagram para confirmar tu pedido y coordinar el pago.
       </div>
     </div>
     <div class="ig">@cam.parfums</div>
-    <div class="totline" id="cam-confirm-tot"></div>
     <button id="cam-confirm-close">Seguir explorando</button>
   </div>
 </div>
@@ -419,6 +473,9 @@ const PRICE_KEYS = ['precio_1_5','precio_3','precio_5','precio_10'];
 const peso = n => n ? '$'+n.toLocaleString('es-CL') : '—';
 
 let PRODUCTS = [];
+let FRASCOS  = [];
+let frascosCargados = false;
+let vistaActual = 'decants';
 let cart = [];
 
 /* ─────────────────────────────────────────────────
@@ -651,7 +708,7 @@ function checkout() {
   const groups = {};
   cart.forEach(it => {
     const k = it.nombre+'|'+it.size;
-    if (!groups[k]) groups[k]={marca:it.marca,nombre:it.nombre,conc:it.conc,size:it.size,precio:it.precio,qty:0};
+    if (!groups[k]) groups[k]={marca:it.marca,nombre:it.nombre,conc:it.conc,size:it.size,precio:it.precio,tipo:it.tipo||'Decant',qty:0};
     groups[k].qty++;
   });
   document.getElementById('cam-confirm-list').innerHTML = Object.values(groups).map(g=>
@@ -664,8 +721,107 @@ function checkout() {
   nombreInput.value = '';
 
   // Registrar pedido en Apps Script (async, sin bloquear UI)
-  const body = { cliente: nombre, numero: num, items: Object.values(groups).map(g=>({sku:'',nombre:g.nombre,concentracion:g.conc||'',tamano:g.size,cantidad:g.qty,valorUnitario:g.precio})) };
+  const body = { cliente: nombre, numero: num, items: Object.values(groups).map(g=>({sku:'',nombre:g.nombre,concentracion:g.conc||'',tamano:g.size||'',tipo:g.tipo||'Decant',cantidad:g.qty,valorUnitario:g.precio})) };
   fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(body) }).catch(()=>{});
+}
+
+/* ─────────────────────────────────────────────────
+   SWITCH VISTA
+───────────────────────────────────────────────── */
+function switchVista(v) {
+  vistaActual = v;
+  document.getElementById('btn-decants').classList.toggle('active', v==='decants');
+  document.getElementById('btn-frascos').classList.toggle('active', v==='frascos');
+  document.getElementById('cam-catalog').style.display  = v==='decants' ? '' : 'none';
+  document.getElementById('cam-frascos').style.display  = v==='frascos' ? '' : 'none';
+  document.getElementById('cam-tools').style.display    = v==='decants' ? '' : 'none';
+  if (v==='frascos' && !frascosCargados) cargarFrascos();
+}
+
+async function cargarFrascos() {
+  try {
+    const res  = await fetch(SCRIPT_URL + '?vista=frascos');
+    const data = await res.json();
+    if (!data.ok || !data.frascos) throw new Error('Sin datos');
+    FRASCOS = data.frascos.filter(f => f.estado === 'activo' || !f.estado);
+    frascosCargados = true;
+    renderFrascos();
+  } catch(e) {
+    document.getElementById('cam-frascos-loading').textContent = 'Error al cargar frascos. Intenta de nuevo.';
+  }
+}
+
+function cardFrasco(f) {
+  const condCls = f.condicion === 'Sellado' ? 'badge-cond-sellado' : 'badge-cond-parcial';
+  const badge = f.condicion ? `<span class="cam-badge ${condCls}">${f.condicion}</span>` : '';
+  const excl  = f.exclusivo ? '<span class="cam-badge excl" style="left:auto;right:11px;">Exclusivo</span>' : '';
+  const ultimos = f.ultimos  ? '<span class="cam-badge" style="left:auto;right:11px;background:var(--vino);">Últimos</span>' : '';
+  const img   = f.foto
+    ? `<img src="${f.foto.replace(/drive\.google\.com\/uc\?id=([^&]+).*/, 'drive.google.com/thumbnail?id=$1&sz=w400')}" alt="${f.nombre}" loading="lazy">`
+    : placeholder({sku:f.sku, marca:f.marca});
+  const famCls  = ['Diseñador','Árabe','Nicho'].includes(f.familia) ? 'f-'+f.familia : 'f-otro';
+  const concCls = ({'Extrait':'c-Extrait','Parfum':'c-Parfum','Elixir':'c-Elixir','EDP':'c-EDP','EDT':'c-EDT'})[f.concentracion] || 'c-otro';
+  const gen     = f.masculino ? 'Masculino' : f.femenino ? 'Femenino' : 'Unisex';
+  const meta    = `<span class="pill m-conc ${concCls}">${f.concentracion}</span>`
+                + `<span class="pill m-fam ${famCls}">${f.familia}</span>`
+                + `<span class="pill m-gen g-${gen}">${gen}</span>`;
+
+  const mlInfo = f.condicion === 'Parcial'
+    ? `<span>🧴 ${f.ml_disponible} ml disp. / ${f.ml_original} ml</span>`
+    : `<span>🧴 ${f.ml_original} ml</span>`;
+
+  const precio = f.condicion === 'Sellado' ? f.precio_nuevo || f.precio
+               : f.condicion === 'Parcial' ? f.precio_abierto || f.precio
+               : f.precio;
+
+  const enCart = cart.some(c=>c.sku===f.sku && c.tipo==='Frasco');
+  const btnCls = enCart ? 'cam-frasco-btn added' : 'cam-frasco-btn';
+  const btnTxt = enCart ? 'Agregado ✓' : 'Agregar al pedido';
+
+  return `<article class="cam-frasco-card">
+    <div class="imgwrap">${badge}${excl}${ultimos}${img}</div>
+    <div class="body">
+      <div class="marca">${f.marca}</div>
+      <div class="nombre">${f.nombre}</div>
+      <div class="meta">${meta}</div>
+      <div class="cam-frasco-info">${mlInfo}</div>
+      ${f.dupe ? `<div class="dupe">insp. <b>${f.dupe}</b></div>` : ''}
+      <div class="cam-frasco-precio">
+        <div class="etiqueta">Precio</div>
+        <div class="valor">${peso(precio)}</div>
+      </div>
+      <button class="${btnCls}" data-sku="${f.sku}" onclick="toggleFrasco('${f.sku}')">${btnTxt}</button>
+    </div>
+  </article>`;
+}
+
+function renderFrascos() {
+  document.getElementById('cam-frascos-loading').style.display = 'none';
+  const grid = document.getElementById('cam-frascos-all');
+  if (!FRASCOS.length) {
+    document.getElementById('cam-frascos-nores').style.display = 'block';
+    return;
+  }
+  grid.style.display = '';
+  grid.innerHTML = FRASCOS.map(cardFrasco).join('');
+  document.getElementById('cam-frascos-count').textContent = FRASCOS.length + ' frasco(s) disponible(s)';
+}
+
+function toggleFrasco(sku) {
+  const f = FRASCOS.find(x=>x.sku===sku);
+  const idx = cart.findIndex(c=>c.sku===sku && c.tipo==='Frasco');
+  if (idx !== -1) {
+    cart.splice(idx, 1);
+    updateCart(); renderFrascos();
+    toast(`${f.nombre} quitado`);
+  } else {
+    const precio = f.condicion === 'Sellado' ? f.precio_nuevo || f.precio
+                 : f.condicion === 'Parcial' ? f.precio_abierto || f.precio
+                 : f.precio;
+    cart.push({sku, nombre:f.nombre, marca:f.marca, conc:f.concentracion, img:f.foto||'', ph:'', size:'', precio, tipo:'Frasco'});
+    updateCart(); renderFrascos();
+    toast(`${f.nombre} añadido`);
+  }
 }
 
 /* ─────────────────────────────────────────────────
