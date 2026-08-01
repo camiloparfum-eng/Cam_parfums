@@ -819,7 +819,7 @@ function toggleFrasco(sku) {
     const precio = f.condicion === 'Sellado' ? f.precio_nuevo || f.precio
                  : f.condicion === 'Parcial' ? f.precio_abierto || f.precio
                  : f.precio;
-    cart.push({sku, nombre:f.nombre, marca:f.marca, conc:f.concentracion, img:f.foto||'', ph:'', size:'', precio, tipo:'Frasco'});
+    cart.push({sku, nombre:f.nombre, marca:f.marca, conc:f.concentracion, img:f.foto ? f.foto.replace(/drive\.google\.com\/uc\?id=([^&]+).*/, 'drive.google.com/thumbnail?id=$1&sz=w400') : '', ph:'', size:f.ml_disponible ? f.ml_disponible+'ml' : '', precio, tipo:'Frasco'});
     updateCart(); renderFrascos();
     toast(`${f.nombre} añadido`);
   }
@@ -905,4 +905,5 @@ initApp();
 </script>
 </body>
 </html>
+
 
