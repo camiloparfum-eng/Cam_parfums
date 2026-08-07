@@ -271,6 +271,13 @@ input{font-family:var(--f);outline:none;}
 .badge-cond-sellado{background:var(--petroleo);color:var(--crema);}
 .badge-cond-parcial{background:var(--caramelo);color:var(--petroleo);}
 
+.cam-confirm-list.two-col{display:grid;grid-template-columns:1fr 1fr;gap:0 20px;}
+.cam-confirm-pager{display:flex;align-items:center;justify-content:space-between;margin-top:14px;gap:10px;}
+.cam-confirm-pager .pinfo{font-size:11px;letter-spacing:.1em;opacity:.6;text-transform:uppercase;}
+.cam-confirm-pager button{background:transparent;border:1px solid rgba(230,223,215,.4);color:var(--crema);padding:7px 16px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;border-radius:3px;transition:.2s;}
+.cam-confirm-pager button:hover{background:var(--crema);color:var(--petroleo);}
+.cam-confirm-pager button:disabled{opacity:.25;cursor:not-allowed;}
+
 /* ── Campo nombre ── */
 .cam-namewrap{margin-bottom:12px;}
 .cam-namelabel{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.6;margin-bottom:6px;font-weight:400;}
@@ -432,12 +439,7 @@ input{font-family:var(--f);outline:none;}
   <div class="ditems" id="cam-ditems"></div>
   <div class="cam-dfoot">
     <div class="tot"><span class="l">Total estimado</span><span class="v" id="cam-total">$0</span></div>
-    <div class="cam-namewrap">
-      <label class="cam-namelabel" for="cam-nombre">Tu nombre o alias <span style="color:var(--vino)">*</span></label>
-      <input id="cam-nombre" class="cam-nameinput" type="text" placeholder="Ej: Camilo, CamiLP…" autocomplete="off" maxlength="40">
-      <div id="cam-nombre-err" class="cam-name-err" style="display:none;">Ingresa un nombre para continuar</div>
-    </div>
-    <button id="cam-checkout" disabled>Generar pedido</button>
+    <button id="cam-checkout" disabled>Ver pedido</button>
   </div>
 </div>
 
@@ -454,7 +456,10 @@ input{font-family:var(--f);outline:none;}
       </div>
     </div>
     <div class="ig">@cam.parfums</div>
-    <button id="cam-confirm-close">Seguir explorando</button>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;">
+      <button id="cam-confirm-back">← Volver</button>
+      <button id="cam-confirm-close">Vaciar</button>
+    </div>
   </div>
 </div>
 
@@ -506,6 +511,9 @@ async function initApp() {
         nombre : p.nombre,
         conc   : p.concentracion,
         fam    : p.familia,
+        masculino: p.masculino,
+        femenino : p.femenino,
+        unisex   : p.unisex,
         gen    : p.masculino ? 'Masculino' : p.femenino ? 'Femenino' : 'Unisex',
         excl   : p.exclusivo,
         dupe   : p.dupe || '',
@@ -621,13 +629,17 @@ function matchDupe(p) {
 
 function applyFilters() {
   const q = state.q.trim().toLowerCase();
-  const f = PRODUCTS.filter(p =>
-    (state.Marca   === 'Todas'   || p.marca === state.Marca)  &&
-    (state.Género  === 'Todos'   || p.gen   === state.Género) &&
-    (state.Familia === 'Todas'   || p.fam   === state.Familia) &&
-    matchDupe(p) &&
-    (!q || (p.nombre+' '+p.marca+' '+p.dupe+' '+p.conc).toLowerCase().includes(q))
-  );
+  const f = PRODUCTS.filter(p => {
+    const genOk = state.Género === 'Todos' ||
+      (state.Género === 'Masculino' && p.masculino) ||
+      (state.Género === 'Femenino'  && p.femenino)  ||
+      (state.Género === 'Unisex'   && p.unisex);
+    return (state.Marca === 'Todas' || p.marca === state.Marca) &&
+      genOk &&
+      (state.Familia === 'Todas' || p.fam === state.Familia) &&
+      matchDupe(p) &&
+      (!q || (p.nombre+' '+p.marca+' '+p.dupe+' '+p.conc).toLowerCase().includes(q));
+  });
   render(f,'cam-all');
   let title = 'Catálogo completo';
   if (state.Marca   !== 'Todas')     title = state.Marca;
@@ -688,41 +700,89 @@ function updateCart() {
 function openCart()  { document.getElementById('cam-drawer').classList.add('show'); }
 function closeCart() { document.getElementById('cam-drawer').classList.remove('show'); }
 
-function checkout() {
-  // Validar nombre
-  const nombreInput = document.getElementById('cam-nombre');
-  const nombreErr   = document.getElementById('cam-nombre-err');
-  const nombre = nombreInput.value.trim();
-  if (!nombre) {
-    nombreInput.classList.add('err');
-    nombreErr.style.display = 'block';
-    nombreInput.focus();
-    return;
-  }
-  nombreInput.classList.remove('err');
-  nombreErr.style.display = 'none';
+let confirmPages = [];
+let confirmPageIdx = 0;
+const ITEMS_PER_PAGE = 10;
 
+function checkout() {
   const tot = cart.reduce((s,i)=>s+i.precio, 0);
-  const num = '#CAM-'+String(Math.floor(1000+Math.random()*9000));
-  document.getElementById('cam-ordernum').textContent = num;
+
+  // Identificador automático fecha-hora
+  const ahora = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const id = `CAM-${ahora.getFullYear()}${pad(ahora.getMonth()+1)}${pad(ahora.getDate())}-${pad(ahora.getHours())}${pad(ahora.getMinutes())}`;
+
+  // Agrupar ítems
   const groups = {};
   cart.forEach(it => {
     const k = it.nombre+'|'+it.size;
     if (!groups[k]) groups[k]={marca:it.marca,nombre:it.nombre,conc:it.conc,size:it.size,precio:it.precio,tipo:it.tipo||'Decant',qty:0};
     groups[k].qty++;
   });
-  document.getElementById('cam-confirm-list').innerHTML = Object.values(groups).map(g=>
-    `<div class="row"><div class="l"><span class="q">${g.qty}×</span> ${g.marca} — ${g.nombre}<span class="sz">${g.conc ? g.conc+' · ' : ''}${g.size}</span></div>`
-    +`<div class="p">${peso(g.precio*g.qty)}</div></div>`).join('');
-  document.getElementById('cam-confirm-tot').textContent = cart.length+' decant(s) · Total estimado '+peso(tot);
+  const items = Object.values(groups);
+
+  // Paginar: ≤6 → 1 col una página, 7-12 → 2 col una página, >12 → páginas de 12
+  const totalItems = cart.length;
+  confirmPages = [];
+  if (items.length <= 12) {
+    confirmPages.push(items);
+  } else {
+    for (let i = 0; i < items.length; i += 12) {
+      confirmPages.push(items.slice(i, i + 12));
+    }
+  }
+  confirmPageIdx = 0;
+  renderConfirmPage(tot, id, totalItems);
+
   closeCart();
   document.getElementById('cam-confirm').classList.add('show');
-  cart = []; updateCart(); syncAdded();
-  nombreInput.value = '';
 
-  // Registrar pedido en Apps Script (async, sin bloquear UI)
-  const body = { cliente: nombre, numero: num, items: Object.values(groups).map(g=>({sku:'',nombre:g.nombre,concentracion:g.conc||'',tamano:g.size||'',tipo:g.tipo||'Decant',cantidad:g.qty,valorUnitario:g.precio})) };
+  // NO vaciar carrito aquí — se vacía solo si el usuario toca "Vaciar"
+  // Guardamos snapshot para el Sheet
+  const snapshot = items;
+
+  // Registrar en Sheet
+  const body = { cliente: id, numero: id, items: snapshot.map(g=>({sku:'',nombre:g.nombre,concentracion:g.conc||'',tamano:g.size||'',tipo:g.tipo||'Decant',cantidad:g.qty,valorUnitario:g.precio})) };
   fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(body) }).catch(()=>{});
+}
+
+function renderConfirmPage(tot, id, totalItems) {
+  const page  = confirmPages[confirmPageIdx];
+  const total = confirmPages.length;
+  const twoCol = page.length > 6;
+
+  const filas = page.map(g =>
+    `<div class="row"><div class="l"><span class="q">${g.qty}×</span> ${g.marca} — ${g.nombre}<span class="sz">${g.conc ? g.conc+' · ' : ''}${g.size}</span></div>`
+    +`<div class="p">${peso(g.precio*g.qty)}</div></div>`
+  ).join('');
+
+  const list = document.getElementById('cam-confirm-list');
+  list.className = 'cam-confirm-list' + (twoCol ? ' two-col' : '');
+  list.innerHTML = filas;
+
+  // Total siempre visible
+  document.getElementById('cam-confirm-tot').textContent =
+    `${totalItems} ítem(s) · Total estimado ${peso(tot)}`;
+
+  // Paginador
+  let pager = document.getElementById('cam-confirm-pager');
+  if (!pager) {
+    pager = document.createElement('div');
+    pager.id = 'cam-confirm-pager';
+    pager.className = 'cam-confirm-pager';
+    list.insertAdjacentElement('afterend', pager);
+  }
+  if (total > 1) {
+    pager.style.display = 'flex';
+    pager.innerHTML =
+      `<button id="cpg-prev" ${confirmPageIdx===0?'disabled':''}>← Anterior</button>`
+      +`<span class="pinfo">Página ${confirmPageIdx+1} de ${total}</span>`
+      +`<button id="cpg-next" ${confirmPageIdx===total-1?'disabled':''}>Siguiente →</button>`;
+    document.getElementById('cpg-prev').onclick = () => { confirmPageIdx--; renderConfirmPage(tot, id, totalItems); };
+    document.getElementById('cpg-next').onclick = () => { confirmPageIdx++; renderConfirmPage(tot, id, totalItems); };
+  } else {
+    pager.style.display = 'none';
+  }
 }
 
 /* ─────────────────────────────────────────────────
@@ -843,7 +903,12 @@ function bindEvents() {
   document.getElementById('cam-open-cart').onclick  = openCart;
   document.getElementById('cam-close-cart').onclick = closeCart;
   document.getElementById('cam-checkout').onclick   = checkout;
-  document.getElementById('cam-confirm-close').onclick = ()=>document.getElementById('cam-confirm').classList.remove('show');
+  document.getElementById('cam-confirm-back').onclick  = ()=>document.getElementById('cam-confirm').classList.remove('show');
+  document.getElementById('cam-confirm-close').onclick = ()=>{
+    document.getElementById('cam-confirm').classList.remove('show');
+    cart = []; updateCart(); syncAdded();
+    if (typeof renderFrascos === 'function') renderFrascos();
+  };
 
   // Búsqueda
   const search = document.getElementById('cam-search');
@@ -905,5 +970,3 @@ initApp();
 </script>
 </body>
 </html>
-
-
